@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"strconv"
 
+	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/helpers"
 	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/types"
 	"gopkg.in/yaml.v2"
 )
@@ -27,19 +28,11 @@ func createCommandArgs(kubeconfig Kubeconfig) []string {
 
 func main() {
 	var err error
-
 	var conf Kubeconfig
-	yamlFile, err := ioutil.ReadFile(os.Getenv("KUBECONFIG"))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	err = yaml.Unmarshal(yamlFile, &conf)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 
+	yamlFile, err := ioutil.ReadFile(os.Getenv("KUBECONFIG"))
+	err = yaml.Unmarshal(yamlFile, &conf)
+	CheckGenericError(err)
 	// TODO mac y windows?
 	pidDir := fmt.Sprintf("%s/kubectl-ssh-proxy/%s", os.Getenv("XDG_RUNTIME_DIR"), conf.CurrentCluster)
 	pidPath := fmt.Sprintf("%s/PID", pidDir)
@@ -55,23 +48,15 @@ func main() {
 		}
 		if _, err := os.Stat(pidDir); os.IsNotExist(err) {
 			err = os.MkdirAll(pidDir, 0755)
-			if err != nil {
-				panic(err)
-			}
+			CheckGenericError(err)
 		}
 		args := createCommandArgs(conf)
 		cmd := exec.Command("./bin/kubectl-ssh-proxy-ssh-bin", args...)
 		err = cmd.Start()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		CheckGenericError(err)
 		pid := []byte(strconv.Itoa(cmd.Process.Pid))
 		err = ioutil.WriteFile(pidPath, pid, 0644)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		CheckGenericError(err)
 		fmt.Println("Proxy started!")
 		fmt.Println("Eval the next: \neval HTTPS_PROXY=socks5://localhost:8080")
 
@@ -81,16 +66,10 @@ func main() {
 			os.Exit(1)
 		}
 		file, err := os.Open(pidPath)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		CheckGenericError(err)
 		defer file.Close()
 		pid, err := ioutil.ReadAll(file)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		CheckGenericError(err)
 		p, _ := strconv.Atoi(string(pid))
 		process, _ := os.FindProcess(p)
 		process.Signal(os.Interrupt)

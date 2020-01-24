@@ -8,8 +8,9 @@ import (
 
 	sshlib "github.com/blacknon/go-sshlib"
 	"github.com/jessevdk/go-flags"
-	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/types"
 	"golang.org/x/crypto/ssh"
+	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/types"
+	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/helpers"
 )
 
 type Options struct {
@@ -28,10 +29,7 @@ func parsePrivateKey(keyPath string) (ssh.Signer, error) {
 func createSshTunnel(configuration SSHProxyConfig) {
 	con := &sshlib.Connect{}
 	key, err := parsePrivateKey(configuration.SSHProxy.SSH.KeyPath)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	CheckGenericError(err)
 	key_content := []ssh.AuthMethod{ssh.PublicKeys(key)}
 	err = con.CreateClient(
 		configuration.SSHProxy.SSH.Host,
@@ -39,10 +37,7 @@ func createSshTunnel(configuration SSHProxyConfig) {
 		configuration.SSHProxy.SSH.User,
 		key_content,
 	)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	CheckGenericError(err)
 	con.TCPDynamicForward("localhost", strconv.Itoa(configuration.SSHProxy.BindPort))
 }
 
