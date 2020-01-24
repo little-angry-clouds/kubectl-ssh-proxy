@@ -1,16 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
 
 	sshlib "github.com/blacknon/go-sshlib"
 	"github.com/jessevdk/go-flags"
-	"golang.org/x/crypto/ssh"
-	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/types"
 	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/helpers"
+	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/types"
+	"golang.org/x/crypto/ssh"
 )
 
 type Options struct {
