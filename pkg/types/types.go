@@ -11,7 +11,7 @@ type SSHProxyConfig struct {
 			Host string `yaml:"host"`
 			Port int    `yaml:"port"`
 			User string `yaml:"user"`
-			// TODO añádir soporte para claves ssh y contraseñas
+			// TODO añadir soporte para ssh-agent y contraseñas
 			KeyPath string `yaml:"key_path"`
 		} `yaml:"ssh"`
 		BindPort int `yaml:"bind_port"`
