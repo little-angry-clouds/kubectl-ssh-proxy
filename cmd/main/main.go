@@ -8,8 +8,8 @@ import (
 	"os/exec"
 	"strconv"
 
-	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/helpers"
-	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/types"
+	. "github.com/little-angry-clouds/kubectl-ssh-proxy/internal/helpers"
+	. "github.com/little-angry-clouds/kubectl-ssh-proxy/internal/types"
 	"gopkg.in/yaml.v2"
 )
 
