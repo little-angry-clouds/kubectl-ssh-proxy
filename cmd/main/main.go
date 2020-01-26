@@ -38,7 +38,7 @@ func (proxy *SSHProxy) Start() {
 		CheckGenericError(err)
 	}
 	args := proxy.createArgs()
-	cmd := exec.Command("kubectl-ssh-proxy-ssh-bin", args...)
+	cmd := exec.Command("kube-ssh-proxy-ssh-bin", args...)
 	err = cmd.Start()
 	CheckGenericError(err)
 	// Capture the state of the subcommand. To do it it's necessary to add a little sleep
@@ -48,7 +48,7 @@ func (proxy *SSHProxy) Start() {
 	case err = <-done:
 		message := fmt.Sprintf("# The ssh proxy failed. The error is: %s", err)
 		fmt.Println(message)
-		message = fmt.Sprintf("# You may debug the error executing the ssh binary manually: %s", cmd.String())
+		message = fmt.Sprintf("# You may debug the error by executing the ssh binary manually: %s", cmd.String())
 		fmt.Println(message)
 		os.Exit(1)
 	case <-time.After(1000 * time.Millisecond):

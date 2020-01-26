@@ -7,8 +7,8 @@ endif
 
 # Build binaries
 build: fmt vet
-	go build -o bin/kubectl-ssh-proxy cmd/main/main.go
-	go build -o bin/kubectl-ssh-proxy-ssh-bin cmd/ssh/main.go
+	go build -o bin/kubectl-ssh_proxy cmd/main/main.go
+	go build -o bin/kube-ssh-proxy-ssh-bin cmd/ssh/main.go
 
 # Run go fmt against code
 fmt:
