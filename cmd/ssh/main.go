@@ -7,8 +7,8 @@ import (
 
 	sshlib "github.com/blacknon/go-sshlib"
 	"github.com/jessevdk/go-flags"
-	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/helpers"
-	. "github.com/little-angry-clouds/kubectl-ssh-proxy/pkg/types"
+	. "github.com/little-angry-clouds/kubectl-ssh-proxy/internal/helpers"
+	. "github.com/little-angry-clouds/kubectl-ssh-proxy/internal/types"
 	"golang.org/x/crypto/ssh"
 )
 
