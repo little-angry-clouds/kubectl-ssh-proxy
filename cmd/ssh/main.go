@@ -20,14 +20,10 @@ type Options struct {
 	SSHKeyPath string `short:"k" long:"ssh-key-path" description:"ssh's key to use in login" optional:"no"`
 }
 
-func parsePrivateKey(keyPath string) (ssh.Signer, error) {
-	buff, _ := ioutil.ReadFile(keyPath)
-	return ssh.ParsePrivateKey(buff)
-}
-
 func createSshTunnel(configuration SSHProxyConfig) {
 	con := &sshlib.Connect{}
-	key, err := parsePrivateKey(configuration.SSHProxy.SSH.KeyPath)
+	buff, _ := ioutil.ReadFile(configuration.SSHProxy.SSH.KeyPath)
+	key, err := ssh.ParsePrivateKey(buff)
 	CheckGenericError(err)
 	key_content := []ssh.AuthMethod{ssh.PublicKeys(key)}
 	err = con.CreateClient(
