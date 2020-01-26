@@ -33,7 +33,8 @@ func createSshTunnel(configuration SSHProxyConfig) {
 		key_content,
 	)
 	CheckGenericError(err)
-	con.TCPDynamicForward("localhost", strconv.Itoa(configuration.SSHProxy.BindPort))
+	err = con.TCPDynamicForward("localhost", strconv.Itoa(configuration.SSHProxy.BindPort))
+	CheckGenericError(err)
 }
 
 func main() {
