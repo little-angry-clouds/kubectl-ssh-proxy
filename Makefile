@@ -21,6 +21,6 @@ vet:
 clean:
 	rm bin/*
 
-test: fmt vet build
+test: build
 	go test -coverprofile cover.out \
 		github.com/little-angry-clouds/kubectl-ssh-proxy/cmd/main
