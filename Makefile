@@ -23,5 +23,6 @@ clean:
 
 test: build
 	golint ./... | grep -v "should not use dot imports"
-	go test -coverprofile cover.out \
+	go test \
 		github.com/little-angry-clouds/kubectl-ssh-proxy/cmd/main
+	@gopherbadger -md="README.md" > /dev/null
