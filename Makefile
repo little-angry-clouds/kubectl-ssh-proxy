@@ -5,8 +5,8 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
-# Build manager binary
-manager: fmt vet
+# Build binaries
+build: fmt vet
 	go build -o bin/kubectl-ssh-proxy cmd/main/main.go
 	go build -o bin/kubectl-ssh-proxy-ssh-bin cmd/ssh/main.go
 
@@ -20,3 +20,6 @@ vet:
 
 clean:
 	rm bin/*
+
+test: fmt vet build
+	go test ./... -coverprofile cover.out
