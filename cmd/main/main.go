@@ -113,7 +113,12 @@ func (proxy *SSHProxy) createArgs() []string {
 
 func (proxy *SSHProxy) getKubeconfig() {
 	var kubeconfig Kubeconfig
-	yamlFile, err := ioutil.ReadFile(os.Getenv("KUBECONFIG"))
+	kubeconfigPath := os.Getenv("KUBECONFIG")
+	if kubeconfigPath == "" {
+		// TODO probar con mac y winsux
+		kubeconfigPath = fmt.Sprintf("%s/.kube/config", os.Getenv("HOME"))
+	}
+	yamlFile, err := ioutil.ReadFile(kubeconfigPath)
 	CheckGenericError(err)
 	err = yaml.Unmarshal(yamlFile, &kubeconfig)
 	CheckGenericError(err)
