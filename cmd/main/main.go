@@ -15,16 +15,19 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// SSHProxy is the main object
 type SSHProxy struct {
 	kubeconfig Kubeconfig
 	pidPath    string
 }
 
+// Init initializes the SSHProxy object
 func (proxy *SSHProxy) Init() {
 	proxy.getKubeconfig()
 	proxy.getPidPath()
 }
 
+// Start starts the SSHProxy
 func (proxy *SSHProxy) Start() {
 	var err error
 	pidPath := proxy.pidPath
@@ -58,6 +61,7 @@ func (proxy *SSHProxy) Start() {
 	fmt.Println("Eval the next: \nexport HTTPS_PROXY=socks5://localhost:8080")
 }
 
+// Stop stops the SSHProxy
 func (proxy *SSHProxy) Stop() {
 	pidPath := proxy.pidPath
 	if _, err := os.Stat(pidPath); err != nil {
@@ -76,6 +80,7 @@ func (proxy *SSHProxy) Stop() {
 	os.Remove(pidPath)
 }
 
+// Status gets the SSHProxy status
 func (proxy *SSHProxy) Status() {
 	pidPath := proxy.pidPath
 	if _, err := os.Stat(pidPath); err == nil {
@@ -108,6 +113,7 @@ func (proxy *SSHProxy) createArgs() []string {
 func (proxy *SSHProxy) getKubeconfig() {
 	var kubeconfig Kubeconfig
 	yamlFile, err := ioutil.ReadFile(os.Getenv("KUBECONFIG"))
+	CheckGenericError(err)
 	err = yaml.Unmarshal(yamlFile, &kubeconfig)
 	CheckGenericError(err)
 	proxy.kubeconfig = kubeconfig

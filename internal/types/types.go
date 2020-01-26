@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// SSHProxyConfig is the Kubeconfig section that stores SSHProxy's stuff
 type SSHProxyConfig struct {
 	SSHProxy struct {
 		SSH struct {
@@ -18,6 +19,7 @@ type SSHProxyConfig struct {
 	}
 }
 
+// Kubeconfig stores the relevant Kubeconfig information
 type Kubeconfig struct {
 	CurrentCluster string
 	CurrentContext string `yaml:"current-context"`
@@ -27,6 +29,7 @@ type Kubeconfig struct {
 	SSHProxyConfig
 }
 
+// UnmarshalYAML unmarshals yaml to get the unexistent key CurrentCluster
 func (k *Kubeconfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var err error
 	var aux map[string]interface{}
@@ -36,7 +39,7 @@ func (k *Kubeconfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	k.CurrentContext = aux["current-context"].(string)
 	// Search the name of the cluster of the current context
-	for key, _ := range aux {
+	for key := range aux {
 		if key == "contexts" {
 			c := aux[key].([]interface{})
 			for _, v := range c {
