@@ -46,9 +46,9 @@ func (proxy *SSHProxy) Start() {
 	go func() { done <- cmd.Wait() }()
 	select {
 	case err = <-done:
-		message := fmt.Sprintf("The ssh proxy failed. The error is: %s", err)
+		message := fmt.Sprintf("# The ssh proxy failed. The error is: %s", err)
 		fmt.Println(message)
-		message = fmt.Sprintf("You may debug the error executing the ssh binary manually: %s", cmd.String())
+		message = fmt.Sprintf("# You may debug the error executing the ssh binary manually: %s", cmd.String())
 		fmt.Println(message)
 		os.Exit(1)
 	case <-time.After(10 * time.Millisecond):
@@ -57,15 +57,15 @@ func (proxy *SSHProxy) Start() {
 	pid := []byte(strconv.Itoa(cmd.Process.Pid))
 	err = ioutil.WriteFile(pidPath, pid, 0644)
 	CheckGenericError(err)
-	fmt.Println("Proxy started!")
-	fmt.Println("Eval the next: \nexport HTTPS_PROXY=socks5://localhost:8080")
+	fmt.Println("# The SSH Proxy started!")
+	fmt.Println("# Eval the next: \nexport HTTPS_PROXY=socks5://localhost:8080")
 }
 
 // Stop stops the SSHProxy
 func (proxy *SSHProxy) Stop() {
 	pidPath := proxy.pidPath
 	if _, err := os.Stat(pidPath); err != nil {
-		fmt.Println("The ssh proxy is already stopped!")
+		fmt.Println("# The ssh proxy is already stopped!")
 		os.Exit(1)
 	}
 	file, err := os.Open(pidPath)
@@ -76,7 +76,8 @@ func (proxy *SSHProxy) Stop() {
 	p, _ := strconv.Atoi(string(pid))
 	process, _ := os.FindProcess(p)
 	process.Signal(os.Interrupt)
-	fmt.Println("SSH proxy stopped!")
+	// TODO probar con mac y winsux
+	fmt.Println("# The SSH Proxy is already stopped! Eval the next:\nunset HTTPS_PROXY")
 	os.Remove(pidPath)
 }
 
@@ -84,9 +85,9 @@ func (proxy *SSHProxy) Stop() {
 func (proxy *SSHProxy) Status() {
 	pidPath := proxy.pidPath
 	if _, err := os.Stat(pidPath); err == nil {
-		fmt.Println("SSH proxy activated!")
+		fmt.Println("# The SSH Proxy is active.")
 	} else {
-		fmt.Println("SSH proxy stopped!")
+		fmt.Println("# The SSH Proxy is not active.")
 	}
 }
 
