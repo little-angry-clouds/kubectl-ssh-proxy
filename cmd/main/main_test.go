@@ -17,7 +17,7 @@ type Suite struct {
 }
 
 func (suite *Suite) SetupTest() {
-	os.Setenv("KUBECONFIG", "/home/ap/.syncthing/Trabajo/PD/little-angry-clouds/kubectl-ssh-proxy/cmd/main/test_data/example.yml")
+	os.Setenv("KUBECONFIG", "./test_data/example.yml")
 	suite.sshProxy = SSHProxy{}
 	suite.sshProxy.getKubeconfig()
 	os.Setenv("KUBECONFIG", "")
