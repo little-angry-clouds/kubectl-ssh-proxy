@@ -72,16 +72,16 @@ func (proxy *SSHProxy) Stop() {
 	p, _ := strconv.Atoi(string(pid))
 	process, _ := os.FindProcess(p)
 	process.Signal(os.Interrupt)
-	fmt.Println("Proxy stopped!")
+	fmt.Println("SSH proxy stopped!")
 	os.Remove(pidPath)
 }
 
 func (proxy *SSHProxy) Status() {
 	pidPath := proxy.pidPath
 	if _, err := os.Stat(pidPath); err == nil {
-		fmt.Println("Proxy activated!")
+		fmt.Println("SSH proxy activated!")
 	} else {
-		fmt.Println("Proxy stopped!")
+		fmt.Println("SSH proxy stopped!")
 	}
 }
 
