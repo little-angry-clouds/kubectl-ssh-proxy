@@ -50,3 +50,26 @@ func (suite *Suite) TestGetPidPath() {
 	suite.sshProxy.getPidPath()
 	assert.Equal(suite.T(), "/run/user/1000/kubectl-ssh-proxy/MyCluster/PID", suite.sshProxy.pidPath, "they should be equal")
 }
+
+func (suite *Suite) TestSSHProxyStopNotActivated() {
+	suite.sshProxy.getPidPath()
+	pidPath := suite.sshProxy.pidPath
+	emptyFile, _ := os.Create(pidPath)
+	defer emptyFile.Close()
+	suite.sshProxy.Stop()
+	_, err := os.Stat(pidPath)
+	assert.NotEqual(suite.T(), err, nil, "they should not be equal")
+}
+
+func (suite *Suite) TestSSHProxyStatusActivated() {
+	suite.sshProxy.getPidPath()
+	pidPath := suite.sshProxy.pidPath
+	emptyFile, _ := os.Create(pidPath)
+	defer emptyFile.Close()
+	suite.sshProxy.Status()
+	os.Remove(pidPath)
+}
+
+func (suite *Suite) TestSSHProxyStatusNotActivated() {
+	suite.sshProxy.Status()
+}
