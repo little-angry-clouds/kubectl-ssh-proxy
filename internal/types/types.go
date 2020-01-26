@@ -58,6 +58,8 @@ func (k *Kubeconfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	k.SSHProxy.SSH.Host = kubeSshProxyConfigSsh["host"].(string)
 	k.SSHProxy.SSH.User = kubeSshProxyConfigSsh["user"].(string)
 	k.SSHProxy.SSH.Port = kubeSshProxyConfigSsh["port"].(int)
-	k.SSHProxy.SSH.KeyPath = kubeSshProxyConfigSsh["key_path"].(string)
+	if kubeSshProxyConfigSsh["key_path"] != nil {
+		k.SSHProxy.SSH.KeyPath = kubeSshProxyConfigSsh["key_path"].(string)
+	}
 	return nil
 }

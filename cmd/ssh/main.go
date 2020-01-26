@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"net"
 	"os"
 	"strconv"
 
@@ -10,6 +11,7 @@ import (
 	. "github.com/little-angry-clouds/kubectl-ssh-proxy/internal/helpers"
 	. "github.com/little-angry-clouds/kubectl-ssh-proxy/internal/types"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/agent"
 )
 
 type options struct {
@@ -20,17 +22,33 @@ type options struct {
 	SSHKeyPath string `short:"k" long:"ssh-key-path" description:"ssh's key to use in login" optional:"no"`
 }
 
+func getAuthType(keyPath string) []ssh.AuthMethod {
+	var auth []ssh.AuthMethod
+	if keyPath == "" {
+		// TODO probar con mac y winsux
+		socket := os.Getenv("SSH_AUTH_SOCK")
+		conn, err := net.Dial("unix", socket)
+		CheckGenericError(err)
+		agentClient := agent.NewClient(conn)
+		auth = []ssh.AuthMethod{ssh.PublicKeysCallback(agentClient.Signers)}
+	} else {
+		buff, _ := ioutil.ReadFile(keyPath)
+		key, err := ssh.ParsePrivateKey(buff)
+		CheckGenericError(err)
+		auth = []ssh.AuthMethod{ssh.PublicKeys(key)}
+	}
+	return auth
+}
+
 func createSSHTunnel(configuration SSHProxyConfig) {
+	var auth []ssh.AuthMethod
 	con := &sshlib.Connect{}
-	buff, _ := ioutil.ReadFile(configuration.SSHProxy.SSH.KeyPath)
-	key, err := ssh.ParsePrivateKey(buff)
-	CheckGenericError(err)
-	keyContent := []ssh.AuthMethod{ssh.PublicKeys(key)}
-	err = con.CreateClient(
+	auth = getAuthType(configuration.SSHProxy.SSH.KeyPath)
+	err := con.CreateClient(
 		configuration.SSHProxy.SSH.Host,
 		strconv.Itoa(configuration.SSHProxy.SSH.Port),
 		configuration.SSHProxy.SSH.User,
-		keyContent,
+		auth,
 	)
 	CheckGenericError(err)
 	err = con.TCPDynamicForward("localhost", strconv.Itoa(configuration.SSHProxy.BindPort))
