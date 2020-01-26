@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 
-	sshlib "github.com/blacknon/go-sshlib"
 	"github.com/jessevdk/go-flags"
 	. "github.com/little-angry-clouds/kubectl-ssh-proxy/internal/helpers"
 	. "github.com/little-angry-clouds/kubectl-ssh-proxy/internal/types"
@@ -42,8 +41,8 @@ func getAuthType(keyPath string) []ssh.AuthMethod {
 
 func createSSHTunnel(configuration KubeSSHProxyConfig) {
 	var auth []ssh.AuthMethod
-	con := &sshlib.Connect{}
 	auth = getAuthType(configuration.KubeSSHProxy.SSH.KeyPath)
+	con := &connect{}
 	err := con.CreateClient(
 		configuration.KubeSSHProxy.SSH.Host,
 		strconv.Itoa(configuration.KubeSSHProxy.SSH.Port),
