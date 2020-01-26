@@ -100,19 +100,20 @@ func (proxy *SSHProxy) getPidPath() {
 
 func (proxy *SSHProxy) createArgs() []string {
 	args := []string{
-		"-H", proxy.kubeconfig.SSHProxy.SSH.Host,
-		"-p", strconv.Itoa(proxy.kubeconfig.SSHProxy.SSH.Port),
-		"-u", proxy.kubeconfig.SSHProxy.SSH.User,
-		"-b", strconv.Itoa(proxy.kubeconfig.SSHProxy.BindPort),
+		"-H", proxy.kubeconfig.KubeSSHProxy.SSH.Host,
+		"-p", strconv.Itoa(proxy.kubeconfig.KubeSSHProxy.SSH.Port),
+		"-u", proxy.kubeconfig.KubeSSHProxy.SSH.User,
+		"-b", strconv.Itoa(proxy.kubeconfig.KubeSSHProxy.BindPort),
 	}
-	if proxy.kubeconfig.SSHProxy.SSH.KeyPath != "" {
-		args = append(args, "-k", proxy.kubeconfig.SSHProxy.SSH.KeyPath)
+	if proxy.kubeconfig.KubeSSHProxy.SSH.KeyPath != "" {
+		args = append(args, "-k", proxy.kubeconfig.KubeSSHProxy.SSH.KeyPath)
 	}
 	return args
 }
 
 func (proxy *SSHProxy) getKubeconfig() {
 	var kubeconfig Kubeconfig
+	var kubeSSHProxyConfig KubeSSHProxyConfig
 	kubeconfigPath := os.Getenv("KUBECONFIG")
 	if kubeconfigPath == "" {
 		// TODO probar con mac y winsux
@@ -123,6 +124,17 @@ func (proxy *SSHProxy) getKubeconfig() {
 	err = yaml.Unmarshal(yamlFile, &kubeconfig)
 	CheckGenericError(err)
 	proxy.kubeconfig = kubeconfig
+
+	kubeSSHProxyConfigPath := os.Getenv("KUBECONFIG-SSH-PROXY")
+	if kubeSSHProxyConfigPath == "" {
+		// TODO probar con mac y winsux
+		kubeSSHProxyConfigPath = fmt.Sprintf("%s-ssh-proxy", kubeconfigPath)
+	}
+	yamlFile, err = ioutil.ReadFile(kubeSSHProxyConfigPath)
+	CheckGenericError(err)
+	err = yaml.Unmarshal(yamlFile, &kubeSSHProxyConfig)
+	CheckGenericError(err)
+	proxy.kubeconfig.KubeSSHProxyConfig = kubeSSHProxyConfig
 }
 
 func main() {

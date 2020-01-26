@@ -40,23 +40,23 @@ func getAuthType(keyPath string) []ssh.AuthMethod {
 	return auth
 }
 
-func createSSHTunnel(configuration SSHProxyConfig) {
+func createSSHTunnel(configuration KubeSSHProxyConfig) {
 	var auth []ssh.AuthMethod
 	con := &sshlib.Connect{}
-	auth = getAuthType(configuration.SSHProxy.SSH.KeyPath)
+	auth = getAuthType(configuration.KubeSSHProxy.SSH.KeyPath)
 	err := con.CreateClient(
-		configuration.SSHProxy.SSH.Host,
-		strconv.Itoa(configuration.SSHProxy.SSH.Port),
-		configuration.SSHProxy.SSH.User,
+		configuration.KubeSSHProxy.SSH.Host,
+		strconv.Itoa(configuration.KubeSSHProxy.SSH.Port),
+		configuration.KubeSSHProxy.SSH.User,
 		auth,
 	)
 	CheckGenericError(err)
-	err = con.TCPDynamicForward("localhost", strconv.Itoa(configuration.SSHProxy.BindPort))
+	err = con.TCPDynamicForward("localhost", strconv.Itoa(configuration.KubeSSHProxy.BindPort))
 	CheckGenericError(err)
 }
 
 func main() {
-	var conf SSHProxyConfig
+	var conf KubeSSHProxyConfig
 	var opt options
 	var parser = flags.NewParser(&opt, flags.Default)
 
@@ -67,10 +67,10 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	conf.SSHProxy.SSH.Host = opt.SSHHost
-	conf.SSHProxy.SSH.Port = opt.SSHPort
-	conf.SSHProxy.SSH.User = opt.SSHUser
-	conf.SSHProxy.SSH.KeyPath = opt.SSHKeyPath
-	conf.SSHProxy.BindPort = opt.BindPort
+	conf.KubeSSHProxy.SSH.Host = opt.SSHHost
+	conf.KubeSSHProxy.SSH.Port = opt.SSHPort
+	conf.KubeSSHProxy.SSH.User = opt.SSHUser
+	conf.KubeSSHProxy.SSH.KeyPath = opt.SSHKeyPath
+	conf.KubeSSHProxy.BindPort = opt.BindPort
 	createSSHTunnel(conf)
 }

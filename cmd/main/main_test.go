@@ -5,7 +5,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"os"
-	// "os/exec"
 	"strings"
 	"testing"
 )
@@ -32,11 +31,11 @@ func (suite *Suite) TestGetKubeconfig() {
 	var kubeconfig Kubeconfig
 	kubeconfig.CurrentCluster = "MyCluster"
 	kubeconfig.CurrentContext = "default"
-	kubeconfig.SSHProxy.SSH.Host = "anywhere"
-	kubeconfig.SSHProxy.SSH.Port = 22
-	kubeconfig.SSHProxy.SSH.User = "nobody"
-	kubeconfig.SSHProxy.SSH.KeyPath = "/home/nobody/.ssh/nobody"
-	kubeconfig.SSHProxy.BindPort = 8080
+	kubeconfig.KubeSSHProxy.SSH.Host = "anywhere"
+	kubeconfig.KubeSSHProxy.SSH.Port = 22
+	kubeconfig.KubeSSHProxy.SSH.User = "nobody"
+	kubeconfig.KubeSSHProxy.SSH.KeyPath = "/home/nobody/.ssh/nobody"
+	kubeconfig.KubeSSHProxy.BindPort = 8080
 	assert.Equal(suite.T(), kubeconfig, suite.sshProxy.kubeconfig, "they should be equal")
 }
 

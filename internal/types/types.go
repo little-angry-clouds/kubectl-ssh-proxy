@@ -5,9 +5,9 @@ import (
 	"os"
 )
 
-// SSHProxyConfig is the Kubeconfig section that stores SSHProxy's stuff
-type SSHProxyConfig struct {
-	SSHProxy struct {
+// KubeSSHProxyConfig is the Kubeconfig section that stores SSHProxy's stuff
+type KubeSSHProxyConfig struct {
+	KubeSSHProxy struct {
 		SSH struct {
 			Host string `yaml:"host"`
 			Port int    `yaml:"port"`
@@ -26,10 +26,10 @@ type Kubeconfig struct {
 	Contexts       []struct {
 		Name string `yaml:"name"`
 	} `yaml:"context"`
-	SSHProxyConfig
+	KubeSSHProxyConfig
 }
 
-// UnmarshalYAML unmarshals yaml to get the unexistent key CurrentCluster
+// UnmarshalYAML unmarshals yaml to match kubeconfig config
 func (k *Kubeconfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var err error
 	var aux map[string]interface{}
@@ -56,38 +56,49 @@ func (k *Kubeconfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			}
 		}
 	}
+	return nil
+}
+
+// UnmarshalYAML unmarshals yaml to match kube-ssh-proxy config
+func (k *KubeSSHProxyConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var err error
+	var aux map[string]interface{}
+	if unmarshal(&aux); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	if aux["kube-ssh-proxy"] == nil {
 		fmt.Println("Your configuration is incorrect, you're missing the `kube-ssh-proxy` value.")
 		os.Exit(1)
 	}
-	kubeSshProxyConfig := aux["kube-ssh-proxy"].(map[interface{}]interface{})
-	if kubeSshProxyConfig["ssh"] == nil {
+	kubeSSHProxyConfig := aux["kube-ssh-proxy"].(map[interface{}]interface{})
+	if kubeSSHProxyConfig["ssh"] == nil {
 		fmt.Println("Your configuration is incorrect, you're missing the `kube-ssh-proxy.ssh` value.")
 		os.Exit(1)
 	}
-	kubeSshProxyConfigSsh := kubeSshProxyConfig["ssh"].(map[interface{}]interface{})
-	if kubeSshProxyConfigSsh["host"] == nil {
+	kubeSSHProxyConfigSSH := kubeSSHProxyConfig["ssh"].(map[interface{}]interface{})
+	if kubeSSHProxyConfigSSH["host"] == nil {
 		fmt.Println("Your configuration is incorrect, you're missing the `kube-ssh-proxy.ssh.host` value.")
 		os.Exit(1)
 	}
-	if kubeSshProxyConfigSsh["user"] == nil {
+	if kubeSSHProxyConfigSSH["user"] == nil {
 		fmt.Println("Your configuration is incorrect, you're missing the `kube-ssh-proxy.ssh.host` value.")
 		os.Exit(1)
 	}
-	if kubeSshProxyConfigSsh["port"] == nil {
+	if kubeSSHProxyConfigSSH["port"] == nil {
 		fmt.Println("Your configuration is incorrect, you're missing the `kube-ssh-proxy.ssh.host` value.")
 		os.Exit(1)
 	}
-	if kubeSshProxyConfig["bind_port"] == nil {
+	if kubeSSHProxyConfig["bind_port"] == nil {
 		fmt.Println("Your configuration is incorrect, you're missing the `kube-ssh-proxy.ssh.host` value.")
 		os.Exit(1)
 	}
-	k.SSHProxy.SSH.Host = kubeSshProxyConfigSsh["host"].(string)
-	k.SSHProxy.SSH.User = kubeSshProxyConfigSsh["user"].(string)
-	k.SSHProxy.SSH.Port = kubeSshProxyConfigSsh["port"].(int)
-	k.SSHProxy.BindPort = kubeSshProxyConfig["bind_port"].(int)
-	if kubeSshProxyConfigSsh["key_path"] != nil {
-		k.SSHProxy.SSH.KeyPath = kubeSshProxyConfigSsh["key_path"].(string)
+	k.KubeSSHProxy.SSH.Host = kubeSSHProxyConfigSSH["host"].(string)
+	k.KubeSSHProxy.SSH.User = kubeSSHProxyConfigSSH["user"].(string)
+	k.KubeSSHProxy.SSH.Port = kubeSSHProxyConfigSSH["port"].(int)
+	k.KubeSSHProxy.BindPort = kubeSSHProxyConfig["bind_port"].(int)
+	if kubeSSHProxyConfigSSH["key_path"] != nil {
+		k.KubeSSHProxy.SSH.KeyPath = kubeSSHProxyConfigSSH["key_path"].(string)
 	}
 	return nil
 }

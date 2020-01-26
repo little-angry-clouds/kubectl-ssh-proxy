@@ -22,7 +22,7 @@ clean:
 	rm bin/*
 
 test: build
-	golint ./... | grep -v "should not use dot imports"
 	go test -coverprofile cover.out \
 		github.com/little-angry-clouds/kubectl-ssh-proxy/cmd/main
-	@gopherbadger -md="README.md" > /dev/null
+	golint ./...
+	gopherbadger -md="README.md"
