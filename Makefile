@@ -1,9 +1,11 @@
-# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
-ifeq (,$(shell go env GOBIN))
-GOBIN=$(shell go env GOPATH)/bin
-else
-GOBIN=$(shell go env GOBIN)
-endif
+BIN = $(CURDIR)/bin
+$(BIN):
+	@mkdir -p $@
+$(BIN)/%: | $(BIN)
+	@tmp=$$(mktemp -d); \
+	   env GO111MODULE=off GOPATH=$$tmp GOBIN=$(BIN) go get $(PACKAGE) \
+		|| ret=$$?; \
+	   rm -rf $$tmp ; exit $$ret
 
 # Build binaries
 build: fmt vet
@@ -21,8 +23,13 @@ vet:
 clean:
 	rm bin/*
 
-test: build
+$(BIN)/golint: PACKAGE=golang.org/x/lint/golint
+
+GOLINT = $(BIN)/golint
+lint: | $(GOLINT)
+	$(GOLINT) ./...
+
+test: fmt vet lint
 	go test -coverprofile cover.out \
 		github.com/little-angry-clouds/kubectl-ssh-proxy/cmd/main
-	golint ./...
 	gopherbadger -md="README.md"
