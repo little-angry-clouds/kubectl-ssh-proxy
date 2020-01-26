@@ -41,7 +41,7 @@ func (proxy *SSHProxy) Start() {
 	cmd := exec.Command("kubectl-ssh-proxy-ssh-bin", args...)
 	err = cmd.Start()
 	CheckGenericError(err)
-	// Capture the state of the subcommand
+	// Capture the state of the subcommand. To do it it's necessary to add a little sleep
 	done := make(chan error)
 	go func() { done <- cmd.Wait() }()
 	select {
@@ -51,7 +51,7 @@ func (proxy *SSHProxy) Start() {
 		message = fmt.Sprintf("# You may debug the error executing the ssh binary manually: %s", cmd.String())
 		fmt.Println(message)
 		os.Exit(1)
-	case <-time.After(10 * time.Millisecond):
+	case <-time.After(1000 * time.Millisecond):
 		// timeout, which means that all works correctly
 	}
 	pid := []byte(strconv.Itoa(cmd.Process.Pid))
