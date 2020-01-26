@@ -1,0 +1,14 @@
+contexts:
+- context:
+    cluster: MyCluster
+    namespace: kube-system
+    user: default
+  name: default
+current-context: default
+kube-ssh-proxy:
+  ssh:
+    host: anywhere
+    port: 22
+    user: nobody
+    key_path: /home/nobody/.ssh/nobody
+  bind_port: 8080
