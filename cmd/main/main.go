@@ -66,7 +66,7 @@ func (proxy *SSHProxy) Stop() {
 	pidPath := proxy.pidPath
 	if _, err := os.Stat(pidPath); err != nil {
 		fmt.Println("# The ssh proxy is already stopped!")
-		os.Exit(1)
+		os.Exit(0)
 	}
 	file, err := os.Open(pidPath)
 	CheckGenericError(err)
