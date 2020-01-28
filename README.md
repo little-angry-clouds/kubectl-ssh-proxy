@@ -2,16 +2,16 @@
 
 [![License](https://img.shields.io/github/license/little-angry-clouds/kubectl-ssh-proxy.svg)](https://github.com/little-angry-clouds/kubectl-ssh-proxy/blob/master/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/little-angry-clouds/kubectl-ssh-proxy)](https://goreportcard.com/report/github.com/little-angry-clouds/kubectl-ssh-proxy)
-<a href='https://github.com/jpoles1/gopherbadger' target='_blank'>![gopherbadger-tag-do-not-edit](https://img.shields.io/badge/Go%20Coverage-48%25-brightgreen.svg?longCache=true&style=flat)</a>
+<a href='https://github.com/jpoles1/gopherbadger' target='_blank'>![gopherbadger-tag-do-not-edit](https://img.shields.io/badge/Go%20Coverage- 0%25-brightgreen.svg?longCache=true&style=flat)</a>
 
 This plugin aims to make your life easier when using `kubectl` with a cluster
 behind a SSH bastion.
 
 ## TL;DR
 
-`kubectl` SSH Proxy basically spans a SSH Proxy in the background that `kubectl` can use as a socks
-proxy. The configuration is pretty simple, edit your `$KUBECONFIG`-ssh-proxy file and add the next
-section:
+`kubectl` SSH Proxy basically spans a socks proxy in the background that
+`kubectl` can use. The configuration is pretty simple, edit your
+`$KUBECONFIG`-ssh-proxy file and add the next section:
 
 ``` yaml
 kube-ssh-proxy:
@@ -28,11 +28,19 @@ port at `22`, the user at `my-user` and the key to be used is
 `/home/my-user/.ssh/id_rsa`. The `bind_port` is the port that will be set as a
 proxy in your local machine.
 
-The `key_path` key is optional, if you don't set it, the plugin will try to use
+The `key_path` is optional, if you don't set it, the plugin will try to use
 an existing `ssh-agent` session.
 
 The plugin's configuration path can also be set with the `$KUBECONFIG-SSH-PROXY`
 environment variable.
+
+## Install
+
+Install with go get:
+
+``` bash
+go get
+```
 
 ## Demo
 
