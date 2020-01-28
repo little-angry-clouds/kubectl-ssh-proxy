@@ -7,6 +7,8 @@ $(BIN)/%: | $(BIN)
 		|| ret=$$?; \
 	   rm -rf $$tmp ; exit $$ret
 
+$(BIN)/golint: PACKAGE=golang.org/x/lint/golint
+
 # Build binaries
 build: fmt vet
 	go build -o bin/kubectl-ssh_proxy cmd/main/*.go
@@ -23,13 +25,11 @@ vet:
 clean:
 	rm bin/*
 
-$(BIN)/golint: PACKAGE=golang.org/x/lint/golint
-
 GOLINT = $(BIN)/golint
 lint: | $(GOLINT)
-	$(GOLINT) ./...
+	$(GOLINT) -set_exit_status ./...
 
-test: fmt vet lint
+test: build
 	go test -coverprofile cover.out \
 		github.com/little-angry-clouds/kubectl-ssh-proxy/cmd/main
 	gopherbadger -md="README.md"
