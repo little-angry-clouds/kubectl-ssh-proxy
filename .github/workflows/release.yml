@@ -24,5 +24,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: |
-            bin/kube-ssh-proxy.tar.gz
+          files: kube-ssh-proxy.tar.gz
