@@ -12,8 +12,8 @@ $(BIN)/gopherbadger: PACKAGE=github.com/jpoles1/gopherbadger
 
 # Build binaries
 build: test
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o bin/kubectl-ssh_proxy cmd/main/*.go
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o bin/kube-ssh-proxy-ssh-bin cmd/ssh/*.go
+	go build -a -o bin/kubectl-ssh_proxy cmd/main/main.go
+	go build -a -o bin/kube-ssh-proxy-ssh-bin cmd/ssh/*.go
 
 # Run go fmt against code
 fmt:
@@ -35,3 +35,14 @@ test: fmt vet | $(GOPHERBADGER)
 	go test -coverprofile cover.out \
 		github.com/little-angry-clouds/kubectl-ssh-proxy/cmd/main
 	$(GOPHERBADGER) -md="README.md"
+
+PLATFORMS := linux-amd64 linux-386 darwin-amd64 darwin-386 windows-amd64 windows-386
+temp = $(subst -, ,$@)
+os = $(word 1, $(temp))
+arch = $(word 2, $(temp))
+release: $(PLATFORMS)
+$(PLATFORMS):
+	@mkdir -p releases; \
+	CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -a -o bin/kubectl-ssh_proxy-$(os)-$(arch) cmd/main/main.go; \
+	CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -a -o bin/kube-ssh-proxy-ssh-bin-$(os)-$(arch) cmd/ssh/*.go; \
+	tar -cvzf releases/kubectl-ssh-proxy-$(os)-$(arch).tar.gz bin/*-$(os)-$(arch)
