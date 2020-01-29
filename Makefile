@@ -8,6 +8,7 @@ $(BIN)/%: | $(BIN)
 	   rm -rf $$tmp ; exit $$ret
 
 $(BIN)/golint: PACKAGE=golang.org/x/lint/golint
+$(BIN)/gopherbadger: PACKAGE=github.com/jpoles1/gopherbadger
 
 # Build binaries
 build: clean test
@@ -29,7 +30,8 @@ GOLINT = $(BIN)/golint
 lint: | $(GOLINT)
 	$(GOLINT) -set_exit_status ./...
 
-test: fmt vet
+GOPHERBADGER = $(BIN)/gopherbadger
+test: fmt vet | $(GOPHERBADGER)
 	go test -coverprofile cover.out \
 		github.com/little-angry-clouds/kubectl-ssh-proxy/cmd/main
-	gopherbadger -md="README.md"
+	$(GOPHERBADGER) -md="README.md"
