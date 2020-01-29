@@ -15,6 +15,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Test
         run: make test
+      - name: Compress
+        run: tar -cvzf kube-ssh-proxy.tar.gz bin/kubectl-ssh_proxy bin/kube-ssh-proxy-ssh-bin
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -22,5 +24,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            bin/kubectl-ssh_proxy
-            bin/kube-ssh-proxy-ssh-bin
+            bin/kube-ssh-proxy.tar.gz
