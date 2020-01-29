@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path"
 	"strconv"
-	"strings"
 	"time"
 
 	. "github.com/little-angry-clouds/kubectl-ssh-proxy/internal/helpers"
@@ -49,7 +48,7 @@ func (proxy *SSHProxy) Start() {
 	case err = <-done:
 		message := fmt.Sprintf("# The ssh proxy failed. The error is: %s", err)
 		fmt.Println(message)
-		message = fmt.Sprintf("# You may debug the error by executing the ssh binary manually: %s %s", "kube-ssh-proxy-ssh-bin", strings.Join(args[:], " "))
+		message = fmt.Sprintf("# You may debug the error by executing the ssh binary manually: %s", cmd.String())
 		fmt.Println(message)
 		os.Exit(1)
 	case <-time.After(1000 * time.Millisecond):
