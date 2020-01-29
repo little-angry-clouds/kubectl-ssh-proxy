@@ -10,7 +10,7 @@ $(BIN)/%: | $(BIN)
 $(BIN)/golint: PACKAGE=golang.org/x/lint/golint
 
 # Build binaries
-build: fmt vet
+build: clean test
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o bin/kubectl-ssh_proxy cmd/main/*.go
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o bin/kube-ssh-proxy-ssh-bin cmd/ssh/*.go
 
@@ -29,7 +29,7 @@ GOLINT = $(BIN)/golint
 lint: | $(GOLINT)
 	$(GOLINT) -set_exit_status ./...
 
-test: build
+test: fmt vet
 	go test -coverprofile cover.out \
 		github.com/little-angry-clouds/kubectl-ssh-proxy/cmd/main
 	gopherbadger -md="README.md"
