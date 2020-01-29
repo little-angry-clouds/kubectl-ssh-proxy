@@ -13,9 +13,10 @@ jobs:
         id: go
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Test
-        run: make test
+      - name: Build
+        run: make build
       - name: Compress
+        if: startsWith(github.ref, 'refs/tags/')
         run: tar -cvzf kube-ssh-proxy.tar.gz bin/kubectl-ssh_proxy bin/kube-ssh-proxy-ssh-bin
       - name: Release
         uses: softprops/action-gh-release@v1

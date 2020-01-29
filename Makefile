@@ -11,7 +11,7 @@ $(BIN)/golint: PACKAGE=golang.org/x/lint/golint
 $(BIN)/gopherbadger: PACKAGE=github.com/jpoles1/gopherbadger
 
 # Build binaries
-build: clean test
+build: test
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o bin/kubectl-ssh_proxy cmd/main/*.go
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o bin/kube-ssh-proxy-ssh-bin cmd/ssh/*.go
 
