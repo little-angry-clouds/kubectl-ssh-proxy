@@ -17,11 +17,9 @@ type Suite struct {
 
 func (suite *Suite) SetupTest() {
 	os.Setenv("KUBECONFIG", "./test_data/example.yml")
-	os.Setenv("XDG_RUNTIME_DIR", "/run/user/1000")
 	suite.sshProxy = SSHProxy{}
 	suite.sshProxy.getKubeconfig()
 	os.Setenv("KUBECONFIG", "")
-	os.Setenv("XDG_RUNTIME_DIR", "")
 }
 
 func TestSuite(t *testing.T) {
@@ -48,8 +46,10 @@ func (suite *Suite) TestCreateArgs() {
 }
 
 func (suite *Suite) TestGetPidPath() {
+	os.Setenv("XDG_RUNTIME_DIR", "/run/user/1000")
 	suite.sshProxy.getPidPath()
 	assert.Equal(suite.T(), "/run/user/1000/kubectl-ssh-proxy/MyCluster/PID", suite.sshProxy.pidPath, "they should be equal")
+	os.Setenv("XDG_RUNTIME_DIR", "")
 }
 
 func (suite *Suite) TestSSHProxyStatusNotActive() {
