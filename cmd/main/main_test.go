@@ -17,9 +17,11 @@ type Suite struct {
 
 func (suite *Suite) SetupTest() {
 	os.Setenv("KUBECONFIG", "./test_data/example.yml")
+	os.Setenv("XDG_RUNTIME_DIR", "/run/user/1000")
 	suite.sshProxy = SSHProxy{}
 	suite.sshProxy.getKubeconfig()
 	os.Setenv("KUBECONFIG", "")
+	os.Setenv("XDG_RUNTIME_DIR", "")
 }
 
 func TestSuite(t *testing.T) {
