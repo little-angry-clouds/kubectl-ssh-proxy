@@ -37,11 +37,19 @@ environment variable.
 
 ## Install
 
-Install with go get:
+Get the latest release from
+[Github](https://github.com/little-angry-clouds/kubectl-ssh-proxy/releases):
 
 ``` bash
-go get
+latest=$(curl --silent "https://api.github.com/repos/little-angry-clouds/kubectl-ssh-proxy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+curl --silent https://github.com/little-angry-clouds/kubectl-ssh-proxy/releases/download/$latest/kubectl-ssh-proxy-linux-386.tar.gz -O -L
+tar xf kubectl-ssh-proxy-linux*.tar.gz
+sudo mv bin/kubectl-ssh_proxy* /usr/local/bin/kubectl-ssh_proxy
+sudo mv bin/kube-ssh-proxy* /usr/local/bin/kube-ssh-proxy-ssh-bin
 ```
+
+Disclaimer: There's binaries for windows and macOs too, but I haven't test them.
+If you do and have some feedback, please share!
 
 ## Demo
 
@@ -106,6 +114,11 @@ You can do it like this:
 
 No worries, the DNS resolution is done in the bastion machine. If the bastion
 can resolve the domain, `kubectl` will.
+
+### What OS does it support?
+
+Since it's Go, it should work on any OS. There's binaries for windows and macOs
+too, but I haven't test them. If you do and have some feedback, please share!
 
 ## License
 
