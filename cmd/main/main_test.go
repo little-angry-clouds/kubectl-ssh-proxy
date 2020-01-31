@@ -48,15 +48,27 @@ func (suite *Suite) TestCreateArgs() {
 func (suite *Suite) TestGetPidPath() {
 	os.Setenv("XDG_RUNTIME_DIR", "/run/user/1000")
 	suite.sshProxy.getPidPath()
-	assert.Equal(suite.T(), "/run/user/1000/kubectl-ssh-proxy/MyCluster/PID", suite.sshProxy.pidPath, "they should be equal")
 	os.Setenv("XDG_RUNTIME_DIR", "")
+	assert.Equal(suite.T(), "/run/user/1000/kubectl-ssh-proxy/MyCluster/PID", suite.sshProxy.pidPath, "they should be equal")
+}
+
+func (suite *Suite) TestSSHProxyStatusActive() {
+	os.Setenv("XDG_RUNTIME_DIR", "/run/user/1000")
+	expectedMessage := "# The SSH Proxy is active."
+	suite.sshProxy.getPidPath()
+	os.MkdirAll("/run/user/1000/kubectl-ssh-proxy/MyCluster/", os.ModePerm)
+	emptyFile, _ := os.Create("/run/user/1000/kubectl-ssh-proxy/MyCluster/PID")
+	defer emptyFile.Close()
+	message := suite.sshProxy.Status()
+	os.Remove("/run/user/1000/kubectl-ssh-proxy/MyCluster/PID")
+	os.Setenv("XDG_RUNTIME_DIR", "")
+	assert.Equal(suite.T(), expectedMessage, message, "they should be equal")
 }
 
 func (suite *Suite) TestSSHProxyStatusNotActive() {
-	suite.sshProxy.getPidPath()
-	pidPath := suite.sshProxy.pidPath
-	emptyFile, _ := os.Create(pidPath)
-	defer emptyFile.Close()
-	suite.sshProxy.Status()
-	os.Remove(pidPath)
+	os.Setenv("XDG_RUNTIME_DIR", "/run/user/1000")
+	expectedMessage := "# The SSH Proxy is not active."
+	message := suite.sshProxy.Status()
+	os.Setenv("XDG_RUNTIME_DIR", "")
+	assert.Equal(suite.T(), expectedMessage, message, "they should be equal")
 }

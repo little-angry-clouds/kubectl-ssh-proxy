@@ -22,25 +22,34 @@ type SSHProxy struct {
 }
 
 // Init initializes the SSHProxy object
-func (proxy *SSHProxy) Init() {
-	proxy.getKubeconfig()
+func (proxy *SSHProxy) Init() error {
+	var err error
+	err = proxy.getKubeconfig()
+	if err != nil {
+		return err
+	}
 	proxy.getPidPath()
+	return nil
 }
 
 // Start starts the SSHProxy
-func (proxy *SSHProxy) Start() {
+func (proxy *SSHProxy) Start() error {
 	var err error
 	pidPath := proxy.pidPath
 	pidDir := path.Dir(pidPath)
-	CheckActiveProcess(pidPath)
+	if _, err := os.Stat(pidPath); err == nil {
+		return err
+	}
 	if _, err := os.Stat(pidDir); os.IsNotExist(err) {
 		err = os.MkdirAll(pidDir, 0755)
-		CheckGenericError(err)
+		return err
 	}
 	args := proxy.createArgs()
 	cmd := exec.Command("kube-ssh-proxy-ssh-bin", args...)
 	err = cmd.Start()
-	CheckGenericError(err)
+	if err != nil {
+		return err
+	}
 	// Capture the state of the subcommand. To do it it's necessary to add a little sleep
 	done := make(chan error)
 	go func() { done <- cmd.Wait() }()
@@ -56,39 +65,52 @@ func (proxy *SSHProxy) Start() {
 	}
 	pid := []byte(strconv.Itoa(cmd.Process.Pid))
 	err = ioutil.WriteFile(pidPath, pid, 0644)
-	CheckGenericError(err)
+	if err != nil {
+		return err
+	}
 	fmt.Println("# The SSH Proxy started!")
 	fmt.Println("# Eval the next: \nexport HTTPS_PROXY=socks5://localhost:8080")
+	return nil
 }
 
 // Stop stops the SSHProxy
-func (proxy *SSHProxy) Stop() {
+func (proxy *SSHProxy) Stop() error {
 	pidPath := proxy.pidPath
 	if _, err := os.Stat(pidPath); err != nil {
 		fmt.Println("# The ssh proxy is already stopped!")
 		os.Exit(0)
 	}
 	file, err := os.Open(pidPath)
-	CheckGenericError(err)
+	if err != nil {
+		return err
+	}
 	defer file.Close()
 	pid, err := ioutil.ReadAll(file)
-	CheckGenericError(err)
+	if err != nil {
+		return err
+	}
 	p, _ := strconv.Atoi(string(pid))
 	process, _ := os.FindProcess(p)
 	process.Signal(os.Interrupt)
 	// TODO probar con mac y winsux
 	fmt.Println("# The SSH Proxy is already stopped! Eval the next:\nunset HTTPS_PROXY")
 	os.Remove(pidPath)
+	return nil
 }
 
 // Status gets the SSHProxy status
-func (proxy *SSHProxy) Status() {
+func (proxy *SSHProxy) Status() string {
+	var message string
 	pidPath := proxy.pidPath
+	fmt.Println(pidPath)
 	if _, err := os.Stat(pidPath); err == nil {
-		fmt.Println("# The SSH Proxy is active.")
+		fmt.Println(err)
+		message = "# The SSH Proxy is active."
 	} else {
-		fmt.Println("# The SSH Proxy is not active.")
+		fmt.Println(err)
+		message = "# The SSH Proxy is not active."
 	}
+	return message
 }
 
 func (proxy *SSHProxy) getPidPath() {
@@ -111,7 +133,7 @@ func (proxy *SSHProxy) createArgs() []string {
 	return args
 }
 
-func (proxy *SSHProxy) getKubeconfig() {
+func (proxy *SSHProxy) getKubeconfig() error {
 	var kubeconfig Kubeconfig
 	var kubeSSHProxyConfig KubeSSHProxyConfig
 	kubeconfigPath := os.Getenv("KUBECONFIG")
@@ -120,37 +142,57 @@ func (proxy *SSHProxy) getKubeconfig() {
 		kubeconfigPath = fmt.Sprintf("%s/.kube/config", os.Getenv("HOME"))
 	}
 	yamlFile, err := ioutil.ReadFile(kubeconfigPath)
-	CheckGenericError(err)
+	if err != nil {
+		return err
+	}
 	err = yaml.Unmarshal(yamlFile, &kubeconfig)
-	CheckGenericError(err)
+	if err != nil {
+		return err
+	}
 	proxy.kubeconfig = kubeconfig
-
 	kubeSSHProxyConfigPath := os.Getenv("KUBECONFIG-SSH-PROXY")
 	if kubeSSHProxyConfigPath == "" {
 		// TODO probar con mac y winsux
 		kubeSSHProxyConfigPath = fmt.Sprintf("%s-ssh-proxy", kubeconfigPath)
 	}
 	yamlFile, err = ioutil.ReadFile(kubeSSHProxyConfigPath)
-	CheckGenericError(err)
+	if err != nil {
+		return err
+	}
 	err = yaml.Unmarshal(yamlFile, &kubeSSHProxyConfig)
-	CheckGenericError(err)
+	if err != nil {
+		return err
+	}
 	proxy.kubeconfig.KubeSSHProxyConfig = kubeSSHProxyConfig
+	return nil
 }
 
 func main() {
+	var err error
 	start := flag.Bool("start", false, "start ssh proxy")
 	stop := flag.Bool("stop", false, "stop ssh proxy")
 	status := flag.Bool("status", true, "status of the ssh proxy")
 	flag.Parse()
 	SSHProxy := SSHProxy{}
-	SSHProxy.Init()
+	err = SSHProxy.Init()
+	if err != nil {
+		CheckGenericError(err)
+	}
 	if *start {
-		SSHProxy.Start()
+		err = SSHProxy.Start()
+		if err != nil {
+			CheckGenericError(err)
+		}
 	} else if *stop {
-		SSHProxy.Stop()
+		err = SSHProxy.Stop()
+		if err != nil {
+			CheckGenericError(err)
+		}
 	} else if *status {
-		SSHProxy.Status()
+		message := SSHProxy.Status()
+		fmt.Println(message)
 	} else {
-		SSHProxy.Status()
+		message := SSHProxy.Status()
+		fmt.Println(message)
 	}
 }
