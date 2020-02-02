@@ -24,7 +24,7 @@ type options struct {
 func getAuthType(keyPath string) []ssh.AuthMethod {
 	var auth []ssh.AuthMethod
 	if keyPath == "" {
-		// TODO probar con mac y winsux
+		// Will probably not work with windows
 		socket := os.Getenv("SSH_AUTH_SOCK")
 		conn, err := net.Dial("unix", socket)
 		CheckGenericError(err)

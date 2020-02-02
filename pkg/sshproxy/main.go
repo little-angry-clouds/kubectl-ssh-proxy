@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -67,7 +68,11 @@ func (proxy *SSHProxy) Start() error {
 		return err
 	}
 	fmt.Println("# The SSH Proxy started!")
-	fmt.Println("# Eval the next: \nexport HTTPS_PROXY=socks5://localhost:8080")
+	if runtime.GOOS == "windows" {
+		fmt.Println("# Eval the next: \nset HTTPS_PROXY=socks5://localhost:8080")
+	} else {
+		fmt.Println("# Eval the next: \nexport HTTPS_PROXY=socks5://localhost:8080")
+	}
 	return nil
 }
 
@@ -87,11 +92,20 @@ func (proxy *SSHProxy) Stop() error {
 	if err != nil {
 		return err
 	}
-	p, _ := strconv.Atoi(string(pid))
-	process, _ := os.FindProcess(p)
+	p, err := strconv.Atoi(string(pid))
+	if err != nil {
+		return err
+	}
+	process, err := os.FindProcess(p)
+	if err != nil {
+		return err
+	}
 	process.Signal(os.Interrupt)
-	// TODO probar con mac y winsux
-	fmt.Println("# The SSH Proxy is already stopped! Eval the next:\nunset HTTPS_PROXY")
+	if runtime.GOOS == "windows" {
+		fmt.Println("# The SSH Proxy is already stopped! Eval the next:\nset HTTPS_PROXY=")
+	} else {
+		fmt.Println("# The SSH Proxy is already stopped! Eval the next:\nunset HTTPS_PROXY")
+	}
 	os.Remove(pidPath)
 	return nil
 }
@@ -109,8 +123,16 @@ func (proxy *SSHProxy) Status() string {
 }
 
 func (proxy *SSHProxy) getPidPath() {
-	// TODO probar con mac y winsux
-	pidDir := fmt.Sprintf("%s/kubectl-ssh-proxy/%s", os.Getenv("XDG_RUNTIME_DIR"), proxy.kubeconfig.CurrentCluster)
+	var path string
+	if runtime.GOOS == "linux" {
+		path = os.Getenv("XDG_RUNTIME_DIR")
+	} else if runtime.GOOS == "darwin" {
+		// Not sure if XDG_RUNTIME_DIR exists, so just to be sure let's set it
+		path = "/tmp/"
+	} else if runtime.GOOS == "windows" {
+		path = "%USERPROFILE%\\AppData\\Local\\Temp"
+	}
+	pidDir := fmt.Sprintf("%s/kubectl-ssh-proxy/%s", path, proxy.kubeconfig.CurrentCluster)
 	pidPath := fmt.Sprintf("%s/PID", pidDir)
 	proxy.pidPath = pidPath
 }
@@ -133,8 +155,11 @@ func (proxy *SSHProxy) getKubeconfig() error {
 	var kubeSSHProxyConfig KubeSSHProxyConfig
 	kubeconfigPath := os.Getenv("KUBECONFIG")
 	if kubeconfigPath == "" {
-		// TODO probar con mac y winsux
-		kubeconfigPath = fmt.Sprintf("%s/.kube/config", os.Getenv("HOME"))
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return err
+		}
+		kubeconfigPath = fmt.Sprintf("%s/.kube/config", home)
 	}
 	yamlFile, err := ioutil.ReadFile(kubeconfigPath)
 	if err != nil {
@@ -147,7 +172,6 @@ func (proxy *SSHProxy) getKubeconfig() error {
 	proxy.kubeconfig = kubeconfig
 	kubeSSHProxyConfigPath := os.Getenv("KUBECONFIG-SSH-PROXY")
 	if kubeSSHProxyConfigPath == "" {
-		// TODO probar con mac y winsux
 		kubeSSHProxyConfigPath = fmt.Sprintf("%s-ssh-proxy", kubeconfigPath)
 	}
 	yamlFile, err = ioutil.ReadFile(kubeSSHProxyConfigPath)
