@@ -1,4 +1,4 @@
-package main
+package sshproxy
 
 import (
 	. "github.com/little-angry-clouds/kubectl-ssh-proxy/internal/types"
@@ -55,10 +55,10 @@ func (suite *Suite) TestGetPidPath() {
 func (suite *Suite) TestSSHProxyStatusActive() {
 	os.Setenv("XDG_RUNTIME_DIR", "/run/user/1000")
 	expectedMessage := "# The SSH Proxy is active."
-	suite.sshProxy.getPidPath()
 	os.MkdirAll("/run/user/1000/kubectl-ssh-proxy/MyCluster/", os.ModePerm)
 	emptyFile, _ := os.Create("/run/user/1000/kubectl-ssh-proxy/MyCluster/PID")
 	defer emptyFile.Close()
+	suite.sshProxy.getPidPath()
 	message := suite.sshProxy.Status()
 	os.Remove("/run/user/1000/kubectl-ssh-proxy/MyCluster/PID")
 	os.Setenv("XDG_RUNTIME_DIR", "")
