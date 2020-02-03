@@ -35,8 +35,7 @@ lint: | $(GOLINT)
 	$(GOLINT) ./...
 
 test: fmt vet
-	go test -coverprofile cover.out \
-		github.com/little-angry-clouds/kubectl-ssh-proxy/cmd/main
+	go test -coverprofile cover.out ./...
 
 PLATFORMS := linux-amd64 linux-386 darwin-amd64 darwin-386 windows-amd64 windows-386
 temp = $(subst -, ,$@)
