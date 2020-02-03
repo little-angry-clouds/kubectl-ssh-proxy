@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -53,14 +54,16 @@ func (suite *Suite) TestGetPidPath() {
 }
 
 func (suite *Suite) TestSSHProxyStatusActive() {
-	os.Setenv("XDG_RUNTIME_DIR", "/run/user/1000")
+	os.Setenv("XDG_RUNTIME_DIR", "/tmp/user/1000")
 	expectedMessage := "# The SSH Proxy is active."
-	os.MkdirAll("/run/user/1000/kubectl-ssh-proxy/MyCluster/", os.ModePerm)
-	emptyFile, _ := os.Create("/run/user/1000/kubectl-ssh-proxy/MyCluster/PID")
+	err := os.MkdirAll(filepath.Dir("/tmp/user/1000/kubectl-ssh-proxy/MyCluster/"), 0777)
+	assert.Equal(suite.T(), nil, err, "they should be equal")
+	emptyFile, err := os.Create("/tmp/user/1000/kubectl-ssh-proxy/MyCluster/PID")
+	assert.Equal(suite.T(), nil, err, "they should be equal")
 	defer emptyFile.Close()
-	suite.sshProxy.getPidPath()
+	suite.sshProxy.pidPath = "/tmp/user/1000/kubectl-ssh-proxy/MyCluster/PID"
 	message := suite.sshProxy.Status()
-	os.Remove("/run/user/1000/kubectl-ssh-proxy/MyCluster/PID")
+	os.Remove("/tmp/user/1000/kubectl-ssh-proxy/MyCluster/PID")
 	os.Setenv("XDG_RUNTIME_DIR", "")
 	assert.Equal(suite.T(), expectedMessage, message, "they should be equal")
 }

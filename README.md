@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/github/license/little-angry-clouds/kubectl-ssh-proxy.svg)](https://github.com/little-angry-clouds/kubectl-ssh-proxy/blob/master/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/little-angry-clouds/kubectl-ssh-proxy)](https://goreportcard.com/report/github.com/little-angry-clouds/kubectl-ssh-proxy)
-<a href='https://github.com/jpoles1/gopherbadger' target='_blank'>![gopherbadger-tag-do-not-edit](https://img.shields.io/badge/Go%20Coverage-32%25-brightgreen.svg?longCache=true&style=flat)</a>
+<a href='https://github.com/jpoles1/gopherbadger' target='_blank'>![gopherbadger-tag-do-not-edit](https://img.shields.io/badge/Go%20Coverage-33%25-brightgreen.svg?longCache=true&style=flat)</a>
 ![Main](https://github.com/little-angry-clouds/kubectl-ssh-proxy/workflows/Main/badge.svg)
 
 This plugin aims to make your life easier when using `kubectl` with a cluster
