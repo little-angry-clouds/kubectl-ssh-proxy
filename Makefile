@@ -10,8 +10,12 @@ $(BIN)/%: | $(BIN)
 $(BIN)/golint: PACKAGE=golang.org/x/lint/golint
 $(BIN)/gopherbadger: PACKAGE=github.com/jpoles1/gopherbadger
 
+GOPHERBADGER = $(BIN)/gopherbadger
+all: clean lint test build | $(GOPHERBADGER)
+	$(GOPHERBADGER) -md="README.md"
+
 # Build binaries
-build: test
+build:
 	go build -a -o bin/kubectl-ssh_proxy cmd/main/main.go
 	go build -a -o bin/kube-ssh-proxy-ssh-bin cmd/ssh/*.go
 
@@ -24,17 +28,15 @@ vet:
 	go vet ./...
 
 clean:
-	rm bin/*
+	rm bin/* 2> /dev/null
 
 GOLINT = $(BIN)/golint
 lint: | $(GOLINT)
-	$(GOLINT) -set_exit_status ./...
+	$(GOLINT) ./...
 
-GOPHERBADGER = $(BIN)/gopherbadger
-test: fmt vet | $(GOPHERBADGER)
+test: fmt vet
 	go test -coverprofile cover.out \
 		github.com/little-angry-clouds/kubectl-ssh-proxy/cmd/main
-	$(GOPHERBADGER) -md="README.md"
 
 PLATFORMS := linux-amd64 linux-386 darwin-amd64 darwin-386 windows-amd64 windows-386
 temp = $(subst -, ,$@)
