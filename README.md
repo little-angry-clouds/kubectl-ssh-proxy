@@ -5,8 +5,8 @@
 <a href='https://github.com/jpoles1/gopherbadger' target='_blank'>![gopherbadger-tag-do-not-edit](https://img.shields.io/badge/Go%20Coverage-33%25-brightgreen.svg?longCache=true&style=flat)</a>
 ![Main](https://github.com/little-angry-clouds/kubectl-ssh-proxy/workflows/Main/badge.svg)
 
-This plugin aims to make your life easier when using `kubectl` with a cluster
-behind a SSH bastion.
+This plugin aims to make your life easier when using `kubectl` a cluster
+that's behind a SSH bastion.
 
 ## TL;DR
 
