@@ -120,6 +120,11 @@ can resolve the domain, `kubectl` will.
 Since it's Go, it should work on any OS. There's binaries for windows and macOs
 too, but I haven't test them. If you do and have some feedback, please share!
 
+## Others
+
+Thanks to the folks at #go-nuts freenode's irc channel for being so friendly,
+some of them helped to define what I need to do with this plugin.
+
 ## License
 
 GPL3
